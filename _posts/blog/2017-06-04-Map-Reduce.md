@@ -26,6 +26,25 @@ Reduce任务:根据用户自定义的Reduce函数，将Map任务生成的中间�
 
 Map-Reduce主要是屏蔽了底层复杂的实现，向用户提供了一个友好的大规模的数据处理手段
 
+此外论文中还提及到几个要点:
+
+### Fault Tolerance ###
+
+1. Master Failure
+
+可以考虑使用定期持久化Master状态，以便down掉的时候，用另外一台机器读取持久化文件并恢复到上一个checkpoint的方式
+
+2. Worker Failure
+
+针对Map Worker，首先worker挂了可以重试，针对多个worker可能同时执行同一个任务的情况，采用Master端谁先上报任务完成状态就采用谁的结果作为最终结果的方式来处理冲突
+
+针对Reduce Worker，是利用GFS原子性的rename来解决冲突的
+
+### Backup Task ###
+
+主要解决部分机器故障或者性能问题导致的任务执行缓慢从而影响整个MapReduce所消耗的时间，在任务即将完成的时候，Master会启动一些额外的Worker去执行尚未完成的任务，来防止该问题发生
+
+
 ## Lab实验小记 ##
 学习这门课程，一定要做相应的Lab实验，才能够更好的理解Map-Reduce
 
